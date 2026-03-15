@@ -362,18 +362,16 @@ section {
 /* =========================================================
    08. HOME - HERO
    ========================================================= */
-
-/* =========================================================
-   08. HOME - HERO
-   ========================================================= */
-
+.hero-stage-section {
+  position: relative;
+  padding: 0 0 96px;
+}
 
 .hero-stage {
   position: relative;
+  width: 100%;
   min-height: 100svh;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
@@ -470,13 +468,15 @@ section {
   animation: heroOverlayIn 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.hero-overlay .container {
+  display: flex;
+  width: 100%;
+}
+
 .hero-overlay__panel {
   width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: 36px 40px 28px;
+  min-height: 100%;
+  padding: 36px 0 28px;
   background: linear-gradient(
     180deg,
     rgba(0, 0, 0, 0.14),
@@ -485,9 +485,20 @@ section {
   animation: heroPanelIn 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.hero-overlay__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 32px;
+  width: 100%;
+}
+
+.hero-overlay__content {
+  min-width: 0;
+}
+
 .hero-intro {
   margin: 0;
-  max-width: 18ch;
+  max-width: 16ch;
   color: var(--text);
   font-size: clamp(30px, 4.5vw, 56px);
   line-height: 1.04;
@@ -1354,7 +1365,19 @@ section {
     bottom: 14px;
     padding: 8px 12px;
   }
-  
+    .hero-overlay__panel {
+    padding: 22px 0 20px;
+  }
+
+  .hero-overlay__grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .hero-intro {
+    font-size: clamp(18px, 7vw, 30px);
+    max-width: 16ch;
+  }
   /* ---------- Shared grids ---------- */
 
   .hero-layout,

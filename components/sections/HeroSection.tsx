@@ -57,7 +57,6 @@ export default function HeroSection() {
     const dx = clientX - startXRef.current;
     const dy = clientY - startYRef.current;
 
-    // lock asse solo dopo un piccolo movimento
     if (!axisRef.current) {
       const threshold = 8;
       if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
@@ -65,12 +64,8 @@ export default function HeroSection() {
       }
     }
 
-    // Se gesto verticale: lascia scorrere la pagina
-    if (axisRef.current === "y") {
-      return;
-    }
+    if (axisRef.current === "y") return;
 
-    // Se gesto orizzontale: controlla la scena
     if (axisRef.current === "x") {
       const sensitivity = 1.6;
       const next = clamp(
@@ -85,7 +80,6 @@ export default function HeroSection() {
   function endDrag() {
     if (!revealed) return;
 
-    // Snap solo se il gesto era orizzontale
     if (axisRef.current === "x") {
       setProgress((prev) => nearestPoint(prev, [0, 0.5, 1]));
     }
@@ -96,103 +90,107 @@ export default function HeroSection() {
 
   return (
     <section className="hero-stage-section">
-      <Container>
+      <div
+        className={`hero-stage hero-stage--${scene} ${
+          revealed ? "is-revealed" : "is-locked"
+        } ${dragging ? "is-dragging" : ""}`}
+        onPointerDown={(e) => {
+          if (!revealed) return;
+          beginDrag(e.clientX, e.clientY);
+        }}
+        onPointerMove={(e) => {
+          if (!dragging || !revealed) return;
+          const rect = e.currentTarget.getBoundingClientRect();
+          updateDrag(e.clientX, e.clientY, rect.width);
+        }}
+        onPointerUp={() => {
+          if (!revealed) return;
+          endDrag();
+        }}
+        onPointerCancel={() => {
+          if (!revealed) return;
+          endDrag();
+        }}
+      >
+        <div className="hero-stage__grid" />
+
         <div
-          className={`hero-stage hero-stage--${scene} ${
-            revealed ? "is-revealed" : "is-locked"
-          } ${dragging ? "is-dragging" : ""}`}
-          onPointerDown={(e) => {
-            if (!revealed) return;
-            beginDrag(e.clientX, e.clientY);
+          className="hero-stage__glow"
+          style={{
+            transform: `translateX(${progress * 180 - 90}px)`,
           }}
-          onPointerMove={(e) => {
-            if (!dragging || !revealed) return;
-            const rect = e.currentTarget.getBoundingClientRect();
-            updateDrag(e.clientX, e.clientY, rect.width);
+        />
+
+        <div
+          className="hero-stage__fx hero-stage__fx--spatial"
+          style={{
+            opacity: Math.max(0, 1 - progress * 2),
+            transform: `translateX(${progress * -50}px) translateY(${progress * 10}px)`,
           }}
-          onPointerUp={() => {
-            if (!revealed) return;
-            endDrag();
+        />
+
+        <div
+          className="hero-stage__fx hero-stage__fx--event"
+          style={{
+            opacity:
+              progress <= 0.5
+                ? progress * 2
+                : Math.max(0, 1 - (progress - 0.5) * 2),
+            transform: `translateY(${(0.5 - progress) * 80}px)`,
           }}
-          onPointerCancel={() => {
-            if (!revealed) return;
-            endDrag();
+        />
+
+        <div
+          className="hero-stage__fx hero-stage__fx--commerce"
+          style={{
+            opacity: Math.max(0, (progress - 0.5) * 2),
+            transform: `translateX(${(1 - progress) * 70}px) scale(${
+              0.92 + progress * 0.08
+            })`,
           }}
-        >
-          <div className="hero-stage__grid" />
+        />
 
-          <div
-            className="hero-stage__glow"
-            style={{
-              transform: `translateX(${progress * 180 - 90}px)`,
-            }}
-          />
-
-          <div
-            className="hero-stage__fx hero-stage__fx--spatial"
-            style={{
-              opacity: Math.max(0, 1 - progress * 2),
-              transform: `translateX(${progress * -50}px) translateY(${progress * 10}px)`,
-            }}
-          />
-
-          <div
-            className="hero-stage__fx hero-stage__fx--event"
-            style={{
-              opacity:
-                progress <= 0.5
-                  ? progress * 2
-                  : Math.max(0, 1 - (progress - 0.5) * 2),
-              transform: `translateY(${(0.5 - progress) * 80}px)`,
-            }}
-          />
-
-          <div
-            className="hero-stage__fx hero-stage__fx--commerce"
-            style={{
-              opacity: Math.max(0, (progress - 0.5) * 2),
-              transform: `translateX(${(1 - progress) * 70}px) scale(${
-                0.92 + progress * 0.08
-              })`,
-            }}
-          />
-
-          {!revealed && (
-            <div className="hero-overlay">
+        {!revealed && (
+          <div className="hero-overlay">
+            <Container>
               <div className="hero-overlay__panel">
-                <span className="eyebrow">{hero.eyebrow}</span>
-                <p className="hero-intro">{hero.subtitle}</p>
+                <div className="hero-overlay__grid">
+                  <div className="hero-overlay__content">
+                    <span className="eyebrow">{hero.eyebrow}</span>
+                    <p className="hero-intro">{hero.subtitle}</p>
 
-                <div className="hero-actions">
-                  <button
-                    type="button"
-                    className="button button-primary"
-                    onClick={() => setRevealed(true)}
-                  >
-                    Enter stage
-                  </button>
+                    <div className="hero-actions">
+                      <button
+                        type="button"
+                        className="button button-primary"
+                        onClick={() => setRevealed(true)}
+                      >
+                        Enter stage
+                      </button>
 
-                  <a
-                    href={hero.secondaryCta.href}
-                    className="button button-secondary"
-                  >
-                    {hero.secondaryCta.label}
-                  </a>
+                      <a
+                        href={hero.secondaryCta.href}
+                        className="button button-secondary"
+                      >
+                        {hero.secondaryCta.label}
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            </Container>
+          </div>
+        )}
 
-          {revealed && (
-            <div className="hero-scene-indicator">
-              <span className="hero-scene-indicator__index">
-                {scene === "spatial" ? "01" : scene === "event" ? "02" : "03"}
-              </span>
-              <span className="hero-scene-indicator__label">{sceneLabel}</span>
-            </div>
-          )}
-        </div>
-      </Container>
+        {revealed && (
+          <div className="hero-scene-indicator">
+            <span className="hero-scene-indicator__index">
+              {scene === "spatial" ? "01" : scene === "event" ? "02" : "03"}
+            </span>
+            <span className="hero-scene-indicator__label">{sceneLabel}</span>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
