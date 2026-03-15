@@ -1,10 +1,15 @@
-export default function Home() {
+import HeroSection from "@/components/sections/HeroSection";
+import ServicesSection from "@/components/sections/ServicesSection";
+import FeaturedProjectsSection from "@/components/sections/FeaturedProjectsSection";
+import ContactSection from "@/components/sections/ContactSection";
+
+export default function HomePage() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-white text-black">
-      <h1 className="text-4xl font-bold">
-        MELATONINA STUDIO 1.0.4 domenico puzza
-      </h1>
-    </main>
+    <>
+      <HeroSection />
+      <ServicesSection />
+      <FeaturedProjectsSection />
+      <ContactSection />
+    </>
   );
 }
-
