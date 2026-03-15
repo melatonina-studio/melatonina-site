@@ -28,7 +28,9 @@ export default function HeroSection() {
   const [revealed, setRevealed] = useState(false);
 
   const startXRef = useRef(0);
+  const startYRef = useRef(0);
   const startProgressRef = useRef(0);
+  const axisRef = useRef<"x" | "y" | null>(null);
 
   const scene = useMemo(() => getScene(progress), [progress]);
 
@@ -39,24 +41,57 @@ export default function HeroSection() {
       ? "Event Experiences"
       : "Interactive Commerce";
 
-  function beginDrag(clientX: number) {
+  function beginDrag(clientX: number, clientY: number) {
     if (!revealed) return;
+
     setDragging(true);
     startXRef.current = clientX;
+    startYRef.current = clientY;
     startProgressRef.current = progress;
+    axisRef.current = null;
   }
 
-  function updateDrag(clientX: number, width: number) {
+  function updateDrag(clientX: number, clientY: number, width: number) {
     if (!revealed) return;
-    const delta = clientX - startXRef.current;
-    const next = clamp(startProgressRef.current + delta / width, 0, 1);
-    setProgress(next);
+
+    const dx = clientX - startXRef.current;
+    const dy = clientY - startYRef.current;
+
+    // lock asse solo dopo un piccolo movimento
+    if (!axisRef.current) {
+      const threshold = 8;
+      if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
+        axisRef.current = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      }
+    }
+
+    // Se gesto verticale: lascia scorrere la pagina
+    if (axisRef.current === "y") {
+      return;
+    }
+
+    // Se gesto orizzontale: controlla la scena
+    if (axisRef.current === "x") {
+      const sensitivity = 1.6;
+      const next = clamp(
+        startProgressRef.current + (dx / width) * sensitivity,
+        0,
+        1
+      );
+      setProgress(next);
+    }
   }
 
   function endDrag() {
     if (!revealed) return;
+
+    // Snap solo se il gesto era orizzontale
+    if (axisRef.current === "x") {
+      setProgress((prev) => nearestPoint(prev, [0, 0.5, 1]));
+    }
+
     setDragging(false);
-    setProgress((prev) => nearestPoint(prev, [0, 0.5, 1]));
+    axisRef.current = null;
   }
 
   return (
@@ -65,26 +100,22 @@ export default function HeroSection() {
         <div
           className={`hero-stage hero-stage--${scene} ${
             revealed ? "is-revealed" : "is-locked"
-          }`}
+          } ${dragging ? "is-dragging" : ""}`}
           onPointerDown={(e) => {
             if (!revealed) return;
-            const el = e.currentTarget;
-            el.setPointerCapture(e.pointerId);
-            beginDrag(e.clientX);
+            beginDrag(e.clientX, e.clientY);
           }}
           onPointerMove={(e) => {
             if (!dragging || !revealed) return;
             const rect = e.currentTarget.getBoundingClientRect();
-            updateDrag(e.clientX, rect.width);
+            updateDrag(e.clientX, e.clientY, rect.width);
           }}
-          onPointerUp={(e) => {
+          onPointerUp={() => {
             if (!revealed) return;
-            e.currentTarget.releasePointerCapture(e.pointerId);
             endDrag();
           }}
-          onPointerCancel={(e) => {
+          onPointerCancel={() => {
             if (!revealed) return;
-            e.currentTarget.releasePointerCapture(e.pointerId);
             endDrag();
           }}
         >
@@ -152,12 +183,14 @@ export default function HeroSection() {
             </div>
           )}
 
-          <div className="hero-scene-indicator">
-            <span className="hero-scene-indicator__index">
-              {scene === "spatial" ? "01" : scene === "event" ? "02" : "03"}
-            </span>
-            <span className="hero-scene-indicator__label">{sceneLabel}</span>
-          </div>
+          {revealed && (
+            <div className="hero-scene-indicator">
+              <span className="hero-scene-indicator__index">
+                {scene === "spatial" ? "01" : scene === "event" ? "02" : "03"}
+              </span>
+              <span className="hero-scene-indicator__label">{sceneLabel}</span>
+            </div>
+          )}
         </div>
       </Container>
     </section>
