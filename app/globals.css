@@ -1504,10 +1504,14 @@ section {
 
 .scene-timeline__track {
   position: relative;
-  height: 44px;
-  touch-action: pan-x;
+  height: 56px;
+  touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+  overscroll-behavior: contain;
+}
+.scene-timeline {
+  touch-action: none;
 }
 
 .scene-timeline__rail,
