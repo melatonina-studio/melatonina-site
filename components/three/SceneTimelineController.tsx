@@ -31,6 +31,9 @@ export default function SceneTimelineController({
 }: SceneTimelineControllerProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const draggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const startYRef = useRef(0);
+  const axisLockedRef = useRef<"x" | "y" | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const snapPoints = useMemo(() => items.map((item) => item.point), [items]);
@@ -58,26 +61,35 @@ export default function SceneTimelineController({
   }
 
   function endDrag() {
-    if (!draggingRef.current) return;
+  if (!draggingRef.current) return;
 
-    draggingRef.current = false;
-    setIsDragging(false);
+  draggingRef.current = false;
+  axisLockedRef.current = null;
+  setIsDragging(false);
 
-    const snapped = nearestPoint(progress, snapPoints);
-    onProgressChange(snapped);
-  }
+  const snapped = nearestPoint(progress, snapPoints);
+  onProgressChange(snapped);
+}
 
   function handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
+    event.preventDefault();
     startDrag(event.clientX);
   }
 
   function handleTouchStart(event: React.TouchEvent<HTMLDivElement>) {
-    const touch = event.touches[0];
-    if (!touch) return;
-    startDrag(touch.clientX);
-  }
+  const touch = event.touches[0];
+  if (!touch) return;
+
+  startXRef.current = touch.clientX;
+  startYRef.current = touch.clientY;
+  axisLockedRef.current = null;
+
+  draggingRef.current = true;
+  setIsDragging(true);
+}
 
   function handleItemClick(point: number) {
+    if (isDragging) return;
     onProgressChange(point);
   }
 
@@ -91,10 +103,32 @@ export default function SceneTimelineController({
     }
 
     function handleTouchMove(event: TouchEvent) {
-      if (!draggingRef.current) return;
-      const touch = event.touches[0];
-      if (!touch) return;
-      moveDrag(touch.clientX);
+    if (!draggingRef.current) return;
+
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    const dx = Math.abs(touch.clientX - startXRef.current);
+    const dy = Math.abs(touch.clientY - startYRef.current);
+
+    // lock asse solo dopo un minimo movimento
+    if (!axisLockedRef.current) {
+        if (dx > 8 || dy > 8) {
+        axisLockedRef.current = dx > dy ? "x" : "y";
+        }
+    }
+
+    // se gesto verticale → lascia scroll pagina
+    if (axisLockedRef.current === "y") {
+        endDrag();
+        return;
+    }
+
+    // se gesto orizzontale → blocca scroll e aggiorna timeline
+    if (axisLockedRef.current === "x") {
+        event.preventDefault();
+        moveDrag(touch.clientX);
+    }
     }
 
     function handleTouchEnd() {
@@ -103,7 +137,7 @@ export default function SceneTimelineController({
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
-    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
     window.addEventListener("touchend", handleTouchEnd);
     window.addEventListener("touchcancel", handleTouchEnd);
 
@@ -120,7 +154,7 @@ export default function SceneTimelineController({
     progress < 0.25 ? 0 : progress < 0.75 ? 1 : 2;
 
   return (
-    <div className="scene-timeline">
+    <div className={`scene-timeline ${isDragging ? "is-dragging" : ""}`}>
       <div className="scene-timeline__top">
         <span className="scene-timeline__label">Scene Controller</span>
         <span className="scene-timeline__value">
@@ -130,7 +164,7 @@ export default function SceneTimelineController({
 
       <div
         ref={trackRef}
-        className={`scene-timeline__track ${isDragging ? "is-dragging" : ""}`}
+        className="scene-timeline__track"
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
       >
