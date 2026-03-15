@@ -1,17 +1,26 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { siteContent } from "@/content/site";
 import Container from "@/components/Container";
 import ExperienceShell from "@/components/three/ExperienceShell";
 import ScenePlaceholder from "@/components/three/ScenePlaceholder";
-import SceneTimelineController from "@/components/three/SceneTimelineController";
 
 const SCENES = [
   { id: "spatial", label: "Spatial Web", point: 0 },
   { id: "event", label: "Event Experiences", point: 0.5 },
   { id: "commerce", label: "Interactive Commerce", point: 1 },
 ] as const;
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function nearestPoint(value: number, points: number[]) {
+  return points.reduce((prev, curr) =>
+    Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev
+  );
+}
 
 function getActiveScene(progress: number) {
   if (progress < 0.25) return "spatial";
@@ -23,6 +32,10 @@ export default function HeroSection() {
   const { hero } = siteContent;
   const [isRevealed, setIsRevealed] = useState(false);
   const [progress, setProgress] = useState(0);
+
+  const startXRef = useRef(0);
+  const startProgressRef = useRef(0);
+  const draggingRef = useRef(false);
 
   const activeScene = useMemo(() => getActiveScene(progress), [progress]);
 
@@ -36,11 +49,43 @@ export default function HeroSection() {
       ? "commerce"
       : "spatial";
 
+  function handlePointerDown(clientX: number) {
+    draggingRef.current = true;
+    startXRef.current = clientX;
+    startProgressRef.current = progress;
+  }
+
+  function handlePointerMove(clientX: number) {
+    if (!draggingRef.current) return;
+
+    const delta = clientX - startXRef.current;
+    const sensitivity = 500;
+    const next = clamp(startProgressRef.current + delta / sensitivity, 0, 1);
+    setProgress(next);
+  }
+
+  function handlePointerUp() {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+
+    const snapped = nearestPoint(progress, SCENES.map((s) => s.point));
+    setProgress(snapped);
+  }
+
   return (
     <section className={`hero-stage-section ${isRevealed ? "is-revealed" : ""}`}>
       <Container>
         <ExperienceShell className="hero-stage-shell hero-stage-shell--fullscreen">
-          <div className="hero-stage">
+          <div
+            className="hero-stage"
+            onMouseDown={(e) => handlePointerDown(e.clientX)}
+            onMouseMove={(e) => handlePointerMove(e.clientX)}
+            onMouseUp={handlePointerUp}
+            onMouseLeave={handlePointerUp}
+            onTouchStart={(e) => handlePointerDown(e.touches[0].clientX)}
+            onTouchMove={(e) => handlePointerMove(e.touches[0].clientX)}
+            onTouchEnd={handlePointerUp}
+          >
             <div className={`hero-stage__visual hero-stage__visual--${variant}`}>
               <ScenePlaceholder
                 label={`${currentLabel} — Main Stage`}
@@ -97,16 +142,11 @@ export default function HeroSection() {
               </div>
             </div>
 
-            <div className="hero-stage__menu">
-              <SceneTimelineController
-                progress={progress}
-                onProgressChange={setProgress}
-                items={SCENES.map((scene) => ({
-                  id: scene.id,
-                  label: scene.label,
-                  point: scene.point,
-                }))}
-              />
+            <div className="hero-scene-indicator">
+              <span className="hero-scene-indicator__index">
+                {activeScene === "spatial" ? "01" : activeScene === "event" ? "02" : "03"}
+              </span>
+              <span className="hero-scene-indicator__label">{currentLabel}</span>
             </div>
           </div>
         </ExperienceShell>
