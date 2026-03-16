@@ -9,9 +9,9 @@ export type ServiceItem = {
 export const siteContent = {
   hero: {
     eyebrow: "melatonina.design",
-    title: "Spatial Web Experiences, Event Experiences, Interactive Commerce",
+    title: "Spatial Web, Event, Interactive Commerce Experiences",
     subtitle:
-      "Progettiamo ambienti digitali, interfacce scenografiche e sistemi interattivi che uniscono design, tecnologia e immaginario.",
+      "Progettiamo ambienti digitali e sistemi interattivi che uniscono design, tecnologia e creatività.",
     primaryCta: {
       label: "Esplora i progetti",
       href: "#projects",

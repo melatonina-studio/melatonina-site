@@ -157,7 +157,7 @@ export default function HeroSection() {
                 <div className="hero-overlay__grid">
                   <div className="hero-overlay__content">
                     <span className="eyebrow">{hero.eyebrow}</span>
-                    <p className="hero-intro">{hero.subtitle}</p>
+                    <h1 className="hero-intro">{hero.title}</h1>
 
                     <div className="hero-actions">
                       <button
