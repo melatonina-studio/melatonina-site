@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { siteContent } from "@/content/site";
 import Container from "@/components/Container";
+import TestStage from "@/components/three/TestStage";
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -113,7 +114,7 @@ export default function HeroSection() {
         }}
       >
         <div className="hero-stage__grid" />
-
+        <TestStage progress={progress} />
         <div
           className="hero-stage__glow"
           style={{

@@ -63,7 +63,6 @@ section {
   position: relative;
 }
 
-
 /* =========================================================
    03. LAYOUT UTILS
    ========================================================= */
@@ -400,7 +399,18 @@ section {
   box-shadow: 0 0 80px rgba(255, 170, 110, 0.12);
   transform-origin: center;
 }
+.hero-three-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
 
+.hero-three-layer canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
 /* overlay manifesto */
 .hero-overlay {
   position: absolute;
