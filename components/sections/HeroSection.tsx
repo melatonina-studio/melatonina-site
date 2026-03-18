@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { siteContent } from "@/content/site";
 import Container from "@/components/Container";
-import TestStage from "@/components/three/TestStage";
+import StageScene from "@/components/three/StageScene";
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -113,43 +113,7 @@ export default function HeroSection() {
           endDrag();
         }}
       >
-        <div className="hero-stage__grid" />
-        <TestStage progress={progress} />
-        <div
-          className="hero-stage__glow"
-          style={{
-            transform: `translateX(${progress * 180 - 90}px)`,
-          }}
-        />
-
-        <div
-          className="hero-stage__fx hero-stage__fx--spatial"
-          style={{
-            opacity: Math.max(0, 1 - progress * 2),
-            transform: `translateX(${progress * -50}px) translateY(${progress * 10}px)`,
-          }}
-        />
-
-        <div
-          className="hero-stage__fx hero-stage__fx--event"
-          style={{
-            opacity:
-              progress <= 0.5
-                ? progress * 2
-                : Math.max(0, 1 - (progress - 0.5) * 2),
-            transform: `translateY(${(0.5 - progress) * 80}px)`,
-          }}
-        />
-
-        <div
-          className="hero-stage__fx hero-stage__fx--commerce"
-          style={{
-            opacity: Math.max(0, (progress - 0.5) * 2),
-            transform: `translateX(${(1 - progress) * 70}px) scale(${
-              0.92 + progress * 0.08
-            })`,
-          }}
-        />
+       
 
         {!revealed && (
           <div className="hero-overlay">

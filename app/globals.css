@@ -305,8 +305,9 @@ section {
 
 
 /* =========================================================
-   08. HOME - HERO
+   08. HOME - HERO three
    ========================================================= */
+   
 .hero-stage-section {
   position: relative;
   padding: 0 0 96px;
@@ -333,84 +334,25 @@ section {
   opacity: 0.55;
 }
 
-.hero-stage__glow {
-  position: absolute;
-  left: 50%;
-  top: 52%;
-  width: 260px;
-  height: 260px;
-  border-radius: 999px;
-  transform: translateX(-50%);
-  filter: blur(60px);
-  opacity: 0.28;
-  background: rgba(120, 200, 255, 0.42);
-  transition: background 0.5s ease;
-}
-
-.hero-stage--spatial .hero-stage__glow {
-  background: rgba(120, 200, 255, 0.42);
-}
-
-.hero-stage--event .hero-stage__glow {
-  background: rgba(140, 110, 255, 0.42);
-}
-
-.hero-stage--commerce .hero-stage__glow {
-  background: rgba(255, 170, 110, 0.42);
-}
-
-.hero-stage__fx {
-  position: absolute;
-  z-index: 2;
-  pointer-events: none;
-  transition: opacity 0.5s linear, transform 0.5s linear;
-}
-
-.hero-stage__fx--spatial {
-  top: -6%;
-  left: 14%;
-  width: 220px;
-  height: 220px;
-  border: 1px solid rgba(120, 200, 255, 0.16);
-  border-radius: 999px;
-  box-shadow: 0 0 80px rgba(120, 200, 255, 0.12);
-}
-
-.hero-stage__fx--event {
-  top: 20%;
-  right: 10%;
-  width: 120px;
-  height: 320px;
-  border-radius: 999px;
-  background: linear-gradient(
-    180deg,
-    rgba(140, 110, 255, 0.28),
-    rgba(140, 110, 255, 0)
-  );
-  filter: blur(10px);
-}
-
-.hero-stage__fx--commerce {
-  right: 10%;
-  bottom: 16%;
-  width: 220px;
-  height: 220px;
-  border: 1px solid rgba(255, 170, 110, 0.14);
-  box-shadow: 0 0 80px rgba(255, 170, 110, 0.12);
-  transform-origin: center;
-}
-.hero-three-layer {
+.stage-canvas {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
 }
 
-.hero-three-layer canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
+.hero-stage__grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.45;
 }
+
+
 /* overlay manifesto */
 .hero-overlay {
   position: absolute;
